@@ -23,4 +23,6 @@ Imports:
     renv,
     stringr,
     tibble,
-    vctrs
+    vctrs,
+    xml2,
+    xmlparsedata
