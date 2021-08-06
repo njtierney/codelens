@@ -17,8 +17,10 @@ Imports:
     cli,
     fs,
     glue,
+    magrittr,
     purrr,
     readr,
     renv,
+    stringr,
     tibble,
     vctrs
