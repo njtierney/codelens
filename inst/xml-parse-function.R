@@ -39,9 +39,7 @@ xml_function_start_end <- function(path){
   fun_line2 <- xml_function(xml) %>% xml_line2()
 
   tibble::tibble(start = fun_line1,
-                 end = fun_line2) %>%
-    tibble::rowid_to_column(var = "fun")
-
+                 end = fun_line2)
 }
 
 fun_start_end_pos <- xml_function_start_end("inst/test-fun.R")
@@ -50,12 +48,23 @@ fun_start_end_pos
 
 test_fun_code <- readLines("inst/test-fun.R")
 
-t(fun_start_end_pos)[,1][-1]
+mat <- t(fun_start_end_pos)
 
-test_fun_code[fun_start_end_pos$start[1]:fun_start_end_pos$end[1]]
-test_fun_code[fun_start_end_pos$start[2]:fun_start_end_pos$end[2]]
+split_mat <- function(x) split(x, rep(1:ncol(x), each = nrow(x)))
 
-"//expr",
-"line1",
-"\\expr",
-"line2"
+fun_pos <- unname(split_mat(mat))
+
+seq_expand <- function(vec){
+  seq(vec[1],  vec[2])
+}
+
+fun_pos_seq <- lapply(fun_pos, seq_expand)
+
+fun1 <- vctrs::vec_slice(test_fun_code, fun_pos_seq[[1]])
+readr::write_lines(x = fun1, file = "fun1.R")
+
+fun2 <- vctrs::vec_slice(test_fun_code, fun_pos_seq[[2]])
+readr::write_lines(x = fun2, file = "fun2.R")
+
+# now just need to get the function names
+# and also test against nested functions
