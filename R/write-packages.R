@@ -19,7 +19,7 @@ write_packages <- function(dir = "R/",
 
   libs_to_write <- c(
     glue::glue("library({unique_libs})"),
-    "library(confliced)"
+    "library(conflicted)"
     )
 
   readr::write_lines(x = libs_to_write,
