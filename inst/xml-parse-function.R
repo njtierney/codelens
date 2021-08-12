@@ -87,7 +87,55 @@ write_functions <- function(extracted_functions, path = NULL){
   )
 }
 
+function_names <- function(path) names(extract_functions(path))
+
+pretty_print_xml <- function(path){
+  parse(file = path,
+        keep.source = TRUE) %>%
+    xmlparsedata::xml_parse_data(pretty = TRUE) %>%
+    cat()
+}
+
+xml_function_use <- function(xml){
+  xp_function_use <- paste0(
+    "//expr",
+    "[SYMBOL_FUNCTION_CALL]"
+  )
+  xml2::xml_find_all(xml, xp_function_use)
+}
+
+xml_thing_start_end <- function(xml, thing){
+
+  # extract_function_lines <-
+  fun_line1 <- thing(xml) %>% xml_line1()
+  fun_line2 <- thing(xml) %>% xml_line2()
+
+  tibble::tibble(start = fun_line1,
+                 end = fun_line2)
+}
+
+function_used <- function(path) {
+  fun_code_text <- readLines(path)
+  xml <- parse_as_xml(fun_code_text)
+  fun_start_end_pos <- xml_thing_start_end(xml, xml_function_use)
+  mat <- t(fun_start_end_pos)
+  fun_pos <- unname(split_mat(mat))
+  fun_pos_seq <- lapply(fun_pos, seq_expand)
+  extracted_funs <- purrr::map_chr(fun_pos_seq,
+                               ~vctrs::vec_slice(x = fun_code_text, i = .x))
+  fun_start_end_pos %>%
+    dplyr::mutate(fun = extracted_funs,
+                  path = path) %>%
+    dplyr::rename(start_line = start) %>%
+    dplyr::select(-end)
+}
+
+
 extract_functions("inst/test-fun.R")
+function_names("inst/test-fun.R")
+function_used("inst/test-fun.R")
+
+pretty_print_xml("inst/test-fun.R")
 
 extract_functions("inst/test-fun.R") %>%
   write_functions(path = "R/")

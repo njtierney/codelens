@@ -7,3 +7,7 @@ hello <- function() "hello"
 goodbye <- function(){
   "goodbye"
 }
+
+hello()
+hello()
+goodbye()
