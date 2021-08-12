@@ -1,3 +1,11 @@
+#' @title Return functions used and which line in a given file
+#' @param path file path
+#' @return data frame of start line, function name, and path
+#' @examples
+#' \dontrun{
+#' function_used("inst/test-fun.R")
+#' }
+#' @export
 function_used <- function(path) {
   fun_code_text <- readLines(path)
   xml <- parse_as_xml(fun_code_text)
